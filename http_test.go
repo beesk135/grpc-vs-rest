@@ -14,7 +14,6 @@ import (
 
 	//"golang.org/x/net/http2"
 	"github.com/Bimde/grpc-vs-rest/pb"
-	"golang.org/x/net/http2"
 )
 
 var client http.Client
@@ -92,17 +91,17 @@ type Request struct {
 const stopRequestPath = "STOP"
 const noWorkers = 4096
 
-func BenchmarkHTTP2GetWithWokers(b *testing.B) {
-	client.Transport = &http2.Transport{
-		TLSClientConfig: createTLSConfigWithCustomCert(),
-	}
-	requestQueue := make(chan Request)
-	defer startWorkers(&requestQueue, noWorkers, startWorker)()
-	b.ResetTimer() // don't count worker initialization time
-	for i := 0; i < b.N; i++ {
-		requestQueue <- Request{Path: "https://bimde:8080", Random: &pb.Random{}}
-	}
-}
+// func BenchmarkHTTP2GetWithWokers(b *testing.B) {
+// 	client.Transport = &http2.Transport{
+// 		TLSClientConfig: createTLSConfigWithCustomCert(),
+// 	}
+// 	requestQueue := make(chan Request)
+// 	defer startWorkers(&requestQueue, noWorkers, startWorker)()
+// 	b.ResetTimer() // don't count worker initialization time
+// 	for i := 0; i < b.N; i++ {
+// 		requestQueue <- Request{Path: "https://bimde:8080", Random: &pb.Random{}}
+// 	}
+// }
 
 func BenchmarkHTTP11Get(b *testing.B) {
 	client.Transport = &http.Transport{

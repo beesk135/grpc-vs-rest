@@ -9,10 +9,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Bimde/grpc-vs-rest/pb"
 	"golang.org/x/net/context"
 	"golang.org/x/net/http2"
 	"google.golang.org/grpc"
+
+	"flag"
+	"time"
 )
 
 func BenchmarkHTTP2GetWithWokers(b *testing.B) {
@@ -33,8 +35,12 @@ func BenchmarkHTTP2GetWithWokers(b *testing.B) {
 	}
 }
 
+var (
+	address = flag.String("address", "127.0.0.1:50051", "Address of service")
+)
+
 func BenchmarkGRPCWithWokers(b *testing.B) {
-	conn, err := grpc.Dial("bimde:9090", grpc.WithInsecure())
+	conn, err := grpc.Dial(*address, grpc.WithTimeout(5*time.Second), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Dial failed: %v", err)
 	}
@@ -45,8 +51,8 @@ func BenchmarkGRPCWithWokers(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		requestQueue <- Request{
-			Path: "http://localhost:9090",
-			Random: &pb.Random{
+			Path: "http://0.0.0.0:50051",
+			Random: &pb.Book{
 				RandomInt:    2019,
 				RandomString: "a_string",
 			},
